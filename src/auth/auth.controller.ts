@@ -26,15 +26,15 @@ router.post('/login', async (req, res) => {
     // Cookies set (unchanged)
     res.cookie("accessToken", access, {
       httpOnly: true,
-      secure: false, // true for HTTPS
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 1000 * 60 * 15 // 15 min
     });
 
     res.cookie("refreshToken", refresh, {
       httpOnly: true,
-      secure: false,
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     });
 
@@ -49,9 +49,9 @@ router.post('/refresh', async (req, res) => {
   try {
     const refresh = req.cookies.refreshToken;  // यह change करें
     if (!refresh) return res.status(401).json({ message: 'Missing refresh token' })  // 400 से 401 करें
-    
+
     const { access } = await svc.refreshTokens(refresh);
-    
+
     // नया access token cookie में set करें
     res.cookie("accessToken", access, {
       httpOnly: true,
@@ -59,24 +59,24 @@ router.post('/refresh', async (req, res) => {
       sameSite: "strict",
       maxAge: 1000 * 60 * 15
     });
-    
+
     res.json({ message: 'Token refreshed' });
   } catch (err: any) {
     res.status(err.status || 500).json({ message: err.message || 'Server error' });
   }
 });
 
-import authenticate from './auth.middleware';  
+import authenticate from './auth.middleware';
 
 router.post('/logout', authenticate, async (req, res) => {
   try {
     const userId = (req as any).user.id;
     await svc.logoutUser(userId);
-    
+
     // Cookies clear करें
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-    
+
     res.json({ ok: true });
   } catch (err: any) {
     res.status(err.status || 500).json({ message: err.message || 'Server error' });

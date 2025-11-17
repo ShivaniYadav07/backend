@@ -6,32 +6,31 @@ import cookieParser from 'cookie-parser';
 
 const app = express();
 
-// Define allowed origins (add localhost if you need it for local dev/testing)
-const allowedOrigins = [
-  'https://frontend-six-weld-32.vercel.app',
-  'https://frontend-six-weld-32.vercel.app/login',
-  'https://frontend-six-weld-32.vercel.app/tasks',
-  'https://frontend-six-weld-32.vercel.app/register',
-  // Uncomment/add if testing locally: 'http://localhost:3000'
-];
+// Determine allowed origins based on environment
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? ['https://frontend-six-weld-32.vercel.app']
+  : ['http://localhost:3000', 'https://frontend-six-weld-32.vercel.app'];
 
-// Apply CORS to ALL routes (not just OPTIONS). This must come BEFORE your routes.
+console.log('CORS allowed origins:', allowedOrigins); // Debug log
+
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (e.g., mobile apps or Postman)
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
-    // Check if the origin is in the allowed list
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+    if (allowedOrigins.includes(origin)) {
+      console.log('✅ Allowed origin:', origin);
+      callback(null, true);
+    } else {
+      console.log('❌ Rejected origin:', origin);
+      callback(new Error('Not allowed by CORS'));
     }
-    return callback(null, true);
   },
-  credentials: true,  // Allows cookies/auth headers
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
 }));
 
-// Other middleware
 app.use(cookieParser());
 app.use(express.json());
 
