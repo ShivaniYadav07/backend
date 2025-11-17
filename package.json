@@ -8,7 +8,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "dev": "node dist/index.ts"
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
