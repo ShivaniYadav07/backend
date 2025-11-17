@@ -11,10 +11,10 @@ const allowedOrigins = [
   "http://localhost:3000", // local dev
   "https://frontend-six-weld-32.vercel.app" // production frontend
 ];
-
-app.use(cors({
+// Handle preflight requests
+app.options('*', cors({
   origin: function(origin, callback) {
-    if (!origin) return callback(null, true); // postman / server-to-server requests
+    if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = "The CORS policy for this site does not allow access from the specified Origin.";
       return callback(new Error(msg), false);
@@ -23,6 +23,7 @@ app.use(cors({
   },
   credentials: true
 }));
+
 
 app.use(cookieParser());
 app.use(express.json())
