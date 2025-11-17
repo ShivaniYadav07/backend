@@ -62,14 +62,14 @@ router.post('/login', async (req, res) => {
         // Cookies set (unchanged)
         res.cookie("accessToken", access, {
             httpOnly: true,
-            secure: false, // true for HTTPS
-            sameSite: "strict",
+            secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 1000 * 60 * 15 // 15 min
         });
         res.cookie("refreshToken", refresh, {
             httpOnly: true,
-            secure: false,
-            sameSite: "strict",
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
         });
         res.json({ user });
