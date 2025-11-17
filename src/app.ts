@@ -9,6 +9,9 @@ const app = express();
 // Define allowed origins (add localhost if you need it for local dev/testing)
 const allowedOrigins = [
   'https://frontend-six-weld-32.vercel.app',
+  'https://frontend-six-weld-32.vercel.app/login',
+  'https://frontend-six-weld-32.vercel.app/tasks',
+  'https://frontend-six-weld-32.vercel.app/register',
   // Uncomment/add if testing locally: 'http://localhost:3000'
 ];
 
